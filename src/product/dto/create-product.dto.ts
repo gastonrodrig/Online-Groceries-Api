@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, Min, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateProductDto {
@@ -10,11 +10,6 @@ export class CreateProductDto {
   @Min(0)
   @IsNotEmpty()
   price: number;
-
-  @Transform(({ value }) => parseFloat(value))
-  @Min(0)
-  @IsNotEmpty()
-  offer_price: number;
 
   @IsString()
   @IsNotEmpty()
@@ -41,8 +36,7 @@ export class CreateProductDto {
   @IsNotEmpty()
   detail: string;
 
-  @Transform(({ value }) => parseInt(value))
-  @Min(0)
-  @IsNotEmpty()
-  is_fav: number;
+  rating: 0;
+
+  review_count: 0;
 }

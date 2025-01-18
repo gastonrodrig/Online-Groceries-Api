@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { StorageService } from 'src/firebase/storage.service';
+import { CreateOfferDto } from './dto/create-offer.dto';
 
 @Injectable()
 export class ProductService {
@@ -36,7 +37,7 @@ export class ProductService {
     const plainData = { ...productData, id: productRef.id, multimediaId: multimediaRef.id };
     await productRef.set(plainData);
 
-    // Obtener los datos rel registro de multimedia
+    // Obtener los datos del registro de multimedia
     const multimediaDoc = await admin.firestore().collection('multimedia').doc(multimediaRef.id).get();
   
     return {
@@ -170,5 +171,41 @@ export class ProductService {
   
     await productRef.delete();
     return { message: `Product ${productId} deleted successfully` };
+  }
+
+  async addOfferToProduct(productId: string, dto: CreateOfferDto) {
+    const productRef = this.firestore.collection('products').doc(productId);
+    const snapshot = await productRef.get();
+
+    if (!snapshot.exists) {
+      throw new Error(`Product not found`);
+    }
+
+    await productRef.update({
+      offer: {
+        price: dto.price,
+        start_date: dto.start_date,
+        end_date: dto.end_date
+      }
+    });
+
+    const updatedSnapshot = await productRef.get();
+    return updatedSnapshot.data();
+  }
+
+  async removeOfferFromProduct(productId: string) {
+    const productRef = this.firestore.collection('products').doc(productId);
+    const snapshot = await productRef.get();
+
+    if (!snapshot.exists) {
+      throw new Error(`Product not found`);
+    }
+
+    await productRef.update({
+      offer: admin.firestore.FieldValue.delete()
+    });
+
+    const updatedSnapshot = await productRef.get();
+    return updatedSnapshot.data();
   }
 }
