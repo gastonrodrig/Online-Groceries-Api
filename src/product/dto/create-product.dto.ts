@@ -1,36 +1,48 @@
-import { IsString, IsNotEmpty, IsNumber, Min } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, Min, IsUUID } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateProductDto {
-  @ApiProperty({ description: 'Name of the product', example: 'Milk' })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ description: 'Price of the product', example: 10.5 })
-  @IsNumber()
+  @Transform(({ value }) => parseFloat(value))
   @Min(0)
+  @IsNotEmpty()
   price: number;
 
-  @ApiProperty({ description: 'Stock of the product', example: 50 })
-  @IsNumber()
+  @Transform(({ value }) => parseFloat(value))
   @Min(0)
-  stock: number;
+  @IsNotEmpty()
+  offer_price: number;
 
-  @ApiProperty({ description: 'Category ID to which the product belongs', example: 'dairy' })
   @IsString()
   @IsNotEmpty()
   categoryId: string;
 
-  @ApiProperty({ description: 'Description of the product', example: 'Fresh Milk' })
   @IsString()
-  description: string;
+  @IsNotEmpty()
+  brandId: string;
 
-  @ApiProperty({ description: 'Brand of the product', example: 'Brand A' })
   @IsString()
-  brand: string;
+  @IsNotEmpty()
+  unit_name: string;
 
-  @ApiProperty({ description: 'Unit of measure for the product', example: 'liters' })
+  @Transform(({ value }) => parseFloat(value))
+  @Min(0)
+  @IsNotEmpty()
+  unit_value: string;
+
   @IsString()
-  unit: string;
+  @IsNotEmpty()
+  nutrition_weight: string;
+
+  @IsString()
+  @IsNotEmpty()
+  detail: string;
+
+  @Transform(({ value }) => parseInt(value))
+  @Min(0)
+  @IsNotEmpty()
+  is_fav: number;
 }

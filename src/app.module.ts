@@ -4,12 +4,14 @@ import { AppService } from './app.service';
 import { ProductModule } from './product/product.module';
 import { CategoryModule } from './category/category.module';
 import { UserModule } from './user/user.module';
+import { BrandModule } from './brand/brand.module';
 
 @Module({
   imports: [
     UserModule,
     ProductModule, 
-    CategoryModule
+    CategoryModule, 
+    BrandModule
   ],
   controllers: [AppController],
   providers: [AppService],
