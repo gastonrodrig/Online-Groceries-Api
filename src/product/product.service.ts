@@ -173,6 +173,32 @@ export class ProductService {
     return { message: `Product ${productId} deleted successfully` };
   }
 
+  async getAllProductsWithOffer() {
+    const productsSnapshot = await this.firestore
+      .collection('products')
+      .where('offer', '!=', null)
+      .get();
+  
+    return Promise.all(
+      productsSnapshot.docs.map(async (doc) => {
+        const productData = doc.data();
+        const categoryDoc = await this.firestore.collection('category').doc(productData.categoryId).get();
+        const brandDoc = await this.firestore.collection('brand').doc(productData.brandId).get();
+        const multimediaDoc = await this.firestore.collection('multimedia').doc(productData.multimediaId).get();
+  
+        return {
+          ...productData,
+          category: categoryDoc.data(),
+          brand: brandDoc.data(),
+          multimedia: multimediaDoc.data(),
+          categoryId: undefined,
+          brandId: undefined,
+          multimediaId: undefined
+        };
+      })
+    );
+  }
+
   async addOfferToProduct(productId: string, dto: CreateOfferDto) {
     const productRef = this.firestore.collection('products').doc(productId);
     const snapshot = await productRef.get();

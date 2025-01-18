@@ -36,6 +36,11 @@ export class ProductController {
   ) {
     return this.productsService.createProduct(productData, file);
   }
+
+  @Get('with-offer')
+  getAllProductsWithOffer() {
+    return this.productsService.getAllProductsWithOffer();
+  }
   
   @Get()
   getAllCategories() {
