@@ -35,8 +35,4 @@ export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
   detail: string;
-
-  rating: 0;
-
-  review_count: 0;
 }

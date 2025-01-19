@@ -42,6 +42,7 @@ export class ProductReviewsService {
         return {
           ...prodReviewData,
           createdAt: convertFirestoreTimestampToISO(prodReviewData.createdAt),
+          updatedAt: convertFirestoreTimestampToISO(prodReviewData.updatedAt),
           product: productDoc.data(),
           user: userDoc.data(),
           productId: undefined,

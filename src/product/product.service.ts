@@ -34,7 +34,13 @@ export class ProductService {
   
     // Crear un documento en la colección products
     const productRef = this.firestore.collection('products').doc();
-    const plainData = { ...productData, id: productRef.id, multimediaId: multimediaRef.id };
+    const plainData = { 
+      ...productData, 
+      id: productRef.id, 
+      multimediaId: multimediaRef.id,
+      rating: 0,
+      review_count: 0
+    };
     await productRef.set(plainData);
 
     // Obtener los datos del registro de multimedia
