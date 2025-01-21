@@ -41,6 +41,11 @@ export class ProductController {
   getAllProductsWithOffer() {
     return this.productsService.getAllProductsWithOffer();
   }
+
+  @Get('best-sellers')
+  getAllBestSellers() {
+    return this.productsService.getAllBestSellers();
+  }
   
   @Get()
   getAllCategories() {

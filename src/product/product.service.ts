@@ -39,7 +39,8 @@ export class ProductService {
       id: productRef.id, 
       multimediaId: multimediaRef.id,
       rating: 0,
-      review_count: 0
+      review_count: 0,
+      is_best_seller: false
     };
     await productRef.set(plainData);
 
@@ -239,5 +240,31 @@ export class ProductService {
 
     const updatedSnapshot = await productRef.get();
     return updatedSnapshot.data();
+  }
+
+  async getAllBestSellers() {
+    const productsSnapshot = await this.firestore
+      .collection('products')
+      .where('is_best_seller', '==', true)
+      .get();
+  
+    return Promise.all(
+      productsSnapshot.docs.map(async (doc) => {
+        const productData = doc.data();
+        const categoryDoc = await this.firestore.collection('category').doc(productData.categoryId).get();
+        const brandDoc = await this.firestore.collection('brand').doc(productData.brandId).get();
+        const multimediaDoc = await this.firestore.collection('multimedia').doc(productData.multimediaId).get();
+  
+        return {
+          ...productData,
+          category: categoryDoc.data(),
+          brand: brandDoc.data(),
+          multimedia: multimediaDoc.data(),
+          categoryId: undefined,
+          brandId: undefined,
+          multimediaId: undefined
+        };
+      })
+    );
   }
 }
