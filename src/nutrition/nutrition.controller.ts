@@ -4,7 +4,7 @@ import { CreateNutritionDto } from './dto/create-nutrition.dto';
 import { UpdateNutritionDto } from './dto/update-nutrition.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('products/:productId/nutrition')
+@Controller('product/:productId/nutrition')
 @ApiTags('Nutrition')
 export class NutritionController {
   constructor(private readonly nutritionService: NutritionService) {}

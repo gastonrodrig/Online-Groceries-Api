@@ -6,32 +6,32 @@ import { CreateUserFavoriteDto } from './dto/create-user-fav.dto';
 export class UserFavoritesService {
   private firestore = admin.firestore();
 
-  async createUserFavorite(userFavoriteData: CreateUserFavoriteDto) {
-    // Verificar si el producto existe
-    const productDoc = await this.firestore.collection('products').doc(userFavoriteData.productId).get();
+  // Crear un favorito
+  async createUserFavorite(createUserFavoriteDto: CreateUserFavoriteDto) {
+    const { userId, productId } = createUserFavoriteDto;
+
+    const productDoc = await this.firestore.collection('products').doc(productId).get();
     if (!productDoc.exists) throw new Error('Product not found');
 
-    // Verificar si el usuario existe
-    const userDoc = await this.firestore.collection('users').doc(userFavoriteData.userId).get();
+    const userDoc = await this.firestore.collection('users').doc(userId).get();
     if (!userDoc.exists) throw new Error('User not found');
 
-    // Crear un documento en la colección products
-    const userFavRef = this.firestore.collection('user-favorite').doc();
-    const plainData = { ...userFavoriteData, id: userFavRef.id };
-    await userFavRef.set(plainData);
+    const userFavRef = this.firestore.collection('user-favorites').doc();
+    const userFavoriteData = { id: userFavRef.id, userId, productId };
+    await userFavRef.set(userFavoriteData);
 
-    // Obtener los datos del registro de producto
     return {
-      ...plainData,
+      ...userFavoriteData,
       product: productDoc.data(),
       user: userDoc.data(),
-      productId: undefined,
+      productId: undefined, 
       userId: undefined
-    }
+    };
   }
 
-  async getAllUserFavorite() {
-    const userFavRef = await this.firestore.collection('user-favorite').get();
+  // Obtener todos los favoritos
+  async getAllUserFavorites() {
+    const userFavRef = await this.firestore.collection('user-favorites').get();
     return Promise.all(
       userFavRef.docs.map(async (doc) => {
         const userFavData = doc.data();
@@ -41,15 +41,72 @@ export class UserFavoritesService {
           ...userFavData,
           product: productDoc.data(),
           user: userDoc.data(),
-          productId: undefined,
+          productId: undefined, 
           userId: undefined
-        }
+        };
       })
-    )
+    );
   }
 
-  async deleteUserFavorite(userFavId: string) {
-    await this.firestore.collection('user-favorite').doc(userFavId).delete();
-    return { message: `User favorite ${userFavId} deleted successfully` };
+  // Verificar si un producto es favorito de un usuario
+  async isFavorite(userId: string, productId: string) {
+    const userFavRef = this.firestore.collection('user-favorites');
+    const query = await userFavRef
+      .where('userId', '==', userId)
+      .where('productId', '==', productId)
+      .get();
+
+    return !query.empty;
+  }
+
+  // Obtener todos los favoritos de un usuario
+  async getUserFavoritesByUserId(userId: string) {
+    const userFavRef = await this.firestore.collection('user-favorites').where('userId', '==', userId).get();
+    return Promise.all(
+      userFavRef.docs.map(async (doc) => {
+        const userFavData = doc.data();
+        const productDoc = await this.firestore.collection('products').doc(userFavData.productId).get();
+        const userDoc = await this.firestore.collection('users').doc(userFavData.userId).get();
+        return {
+          ...userFavData,
+          product: productDoc.data(),
+          user: userDoc.data(),
+          productId: undefined, 
+          userId: undefined
+        };
+      })
+    );
+  }
+
+  // Obtener todos los productos favoritos según userId
+  async getFavoriteProductsByUserId(userId: string) {
+    const userFavRef = await this.firestore.collection('user-favorites').where('userId', '==', userId).get();
+    return Promise.all(
+      userFavRef.docs.map(async (doc) => {
+        const userFavData = doc.data();
+        const productDoc = await this.firestore.collection('products').doc(userFavData.productId).get();
+        return {
+          product: productDoc.data(),
+          productId: undefined
+        };
+      })
+    );
+  }
+
+  // Eliminar un favorito por userId y productId
+  async deleteUserFavoriteByUserAndProductId(userId: string, productId: string) {
+    const userFavRef = await this.firestore.collection('user-favorites')
+      .where('userId', '==', userId)
+      .where('productId', '==', productId)
+      .get();
+
+    if (userFavRef.empty) {
+      throw new Error('Favorite not found for the given user and product');
+    }
+
+    const favoriteId = userFavRef.docs[0].id;
+    await this.firestore.collection('user-favorites').doc(favoriteId).delete();
+
+    return { message: `Favorite deleted successfully` };
   }
 }

@@ -9,17 +9,27 @@ export class UserFavoritesController {
   constructor(private readonly userFavService: UserFavoritesService) {}
 
   @Post()
-  createUserFavorites(@Body() createUserFavDto: CreateUserFavoriteDto) {
-    return this.userFavService.createUserFavorite(createUserFavDto);
+  createUserFavorite(@Body() createUserFavoriteDto: CreateUserFavoriteDto) {
+    return this.userFavService.createUserFavorite(createUserFavoriteDto);
   }
 
   @Get()
   getAllUserFavorites() {
-    return this.userFavService.getAllUserFavorite();
+    return this.userFavService.getAllUserFavorites();
   }
 
-  @Delete(':id')
-  deleteUserFavorite(@Param('id') userFavId: string) {
-    return this.userFavService.deleteUserFavorite(userFavId);
+  @Get('user/:userId')
+  getUserFavoritesByUserId(@Param('userId') userId: string) {
+    return this.userFavService.getUserFavoritesByUserId(userId);
+  }
+
+  @Get('is-favorite/:userId/:productId')
+  isFavorite(@Param('userId') userId: string, @Param('productId') productId: string) {
+    return this.userFavService.isFavorite(userId, productId);
+  }
+
+  @Delete('user/:userId/product/:productId')
+  delete(@Param('userId') userId: string, @Param('productId') productId: string) {
+    return this.userFavService.deleteUserFavoriteByUserAndProductId(userId, productId);
   }
 }
