@@ -57,6 +57,11 @@ export class ProductController {
       return this.productsService.getProductById(productId);
   }
 
+  @Get('category/:categoryId')
+  getProductsByCategory(@Param('categoryId') categoryId: string) {
+    return this.productsService.getProductsByCategory(categoryId);
+  }
+
   @Put(':id')
   @UseInterceptors(FileInterceptor('imageFile'))
   @ApiConsumes('multipart/form-data')

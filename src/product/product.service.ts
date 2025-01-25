@@ -267,4 +267,37 @@ export class ProductService {
       })
     );
   }
+
+  async getProductsByCategory(categoryId: string) {
+    // Verificar si la categoría existe
+    const categoryDoc = await this.firestore.collection('category').doc(categoryId).get();
+    if (!categoryDoc.exists) {
+      throw new Error('Category not found');
+    }
+  
+    // Obtener los productos de la categoría
+    const productsSnapshot = await this.firestore
+      .collection('products')
+      .where('categoryId', '==', categoryId)
+      .get();
+  
+    // Mapear los productos con información adicional
+    return Promise.all(
+      productsSnapshot.docs.map(async (doc) => {
+        const productData = doc.data();
+        const brandDoc = await this.firestore.collection('brand').doc(productData.brandId).get();
+        const multimediaDoc = await this.firestore.collection('multimedia').doc(productData.multimediaId).get();
+  
+        return {
+          ...productData,
+          category: categoryDoc.data(),
+          brand: brandDoc.data(),
+          multimedia: multimediaDoc.data(),
+          categoryId: undefined,
+          brandId: undefined,
+          multimediaId: undefined
+        };
+      })
+    );
+  }  
 }
