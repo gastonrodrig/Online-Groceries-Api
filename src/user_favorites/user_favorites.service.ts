@@ -65,11 +65,21 @@ export class UserFavoritesService {
     return Promise.all(
       userFavRef.docs.map(async (doc) => {
         const userFavData = doc.data();
+
         const productDoc = await this.firestore.collection('products').doc(userFavData.productId).get();
+        const productData = productDoc.data();
+
+        const multimediaDoc = await this.firestore.collection('multimedia').doc(productData.multimediaId).get();
+        const multimediaData = multimediaDoc.data();
+
         const userDoc = await this.firestore.collection('users').doc(userFavData.userId).get();
         return {
           ...userFavData,
-          product: productDoc.data(),
+          product: {
+            ...productData,
+            multimedia: multimediaData,
+            multimediaId: undefined
+          },
           user: userDoc.data(),
           productId: undefined, 
           userId: undefined
