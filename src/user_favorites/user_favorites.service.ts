@@ -88,21 +88,6 @@ export class UserFavoritesService {
     );
   }
 
-  // Obtener todos los productos favoritos según userId
-  async getFavoriteProductsByUserId(userId: string) {
-    const userFavRef = await this.firestore.collection('user-favorites').where('userId', '==', userId).get();
-    return Promise.all(
-      userFavRef.docs.map(async (doc) => {
-        const userFavData = doc.data();
-        const productDoc = await this.firestore.collection('products').doc(userFavData.productId).get();
-        return {
-          product: productDoc.data(),
-          productId: undefined
-        };
-      })
-    );
-  }
-
   // Eliminar un favorito por userId y productId
   async deleteUserFavoriteByUserAndProductId(userId: string, productId: string) {
     const userFavRef = await this.firestore.collection('user-favorites')

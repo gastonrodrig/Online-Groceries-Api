@@ -78,12 +78,19 @@ export class CartService {
         const productDoc = await this.firestore.collection('products').doc(cartItem.productId).get();
         const productData = productDoc.data();
 
+        const multimediaDoc = await this.firestore.collection('multimedia').doc(productData.multimediaId).get();
+        const multimediaData = multimediaDoc.data();
+
         // Obtener datos del usuario
         const userDoc = await this.firestore.collection('users').doc(cartItem.userId).get();
 
         return {
           ...cartItem,
-          product: productData,
+          product: {
+            ...productData,
+            multimedia: multimediaData,
+            multimediaId: undefined
+          },
           user: userDoc.data(),
           productId: undefined,
           userId: undefined
@@ -136,5 +143,20 @@ export class CartService {
     const newQuantity = current - 1;
     await doc.ref.update({ quantity: newQuantity });
     return { message: 'Quantity decremented', quantity: newQuantity };
+  }
+
+  async addMultipleQuantity(userId: string, productId: string, dto: UpdateCartDto) {
+    const snap = await this.firestore.collection('cart')
+      .where('userId', '==', userId)
+      .where('productId', '==', productId)
+      .get();
+    if (snap.empty) throw new Error('Cart item not found');
+
+    const doc = snap.docs[0];
+    const current = doc.data().quantity;
+    const sum = current + dto.quantity;
+    const newQuantity = Math.min(sum, 99);
+    await doc.ref.update({ quantity: newQuantity });
+    return { message: `Quantity updated to ${newQuantity}`, quantity: newQuantity };
   }
 }

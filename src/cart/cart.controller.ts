@@ -55,4 +55,13 @@ export class CartController {
   ) {
     return this.cartService.decreaseCartQuantity(userId, productId);
   }
+
+  @Patch('add-multiple/:userId/:productId')
+  addMultipleQuantity(
+    @Param('userId') userId: string,
+    @Param('productId') productId: string,
+    @Body() dto: UpdateCartDto
+  ) {
+    return this.cartService.addMultipleQuantity(userId, productId, dto);
+  }
 }
